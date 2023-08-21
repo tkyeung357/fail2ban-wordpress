@@ -1,5 +1,5 @@
 # why
-a fail2ban and wordpress setup to study and test how to use fail2ban to protect wordpress wp-login.php and xmlrpc.php
+a fail2ban and WordPress setup to study and test how to use fail2ban to protect WordPress wp-login.php and xmlrpc.php
 
 # build task and check fail2ban status
 config located in .vscode/tasks.json
@@ -9,8 +9,8 @@ config located in .vscode/tasks.json
 - config located in /fail2ban/
 - filter located in /filter.d/
 
-# how to test
-I use burp suite intrunder to test fail2ban
+# How to test
+I use Burp suite intruder to test fail2ban
 payload:
 - snipe-login.txt 
 - snipe-rpc.txt

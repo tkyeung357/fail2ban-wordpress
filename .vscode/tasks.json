@@ -1,0 +1,22 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "rebuild",
+			"type": "shell",
+			"command": "docker compose up -d --build"
+		},
+		{
+			"label": "f2b-status",
+			"type": "shell",
+			"command": "./status.sh",
+			"dependsOn":["rebuild"]
+		},
+		{
+			"label": "build",
+			"dependsOn":["f2b-status"]
+		}
+	]
+}

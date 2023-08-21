@@ -1,0 +1,50 @@
+From wordpress:latest as wp
+WORKDIR /var/www/html
+
+From ubuntu
+ENV TZ=Etc/UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+#wordpress
+RUN apt-get update && apt-get install -y apache2 \
+                 ghostscript \
+                 libapache2-mod-php \
+                 mysql-client \
+                 php \
+                 php-bcmath \
+                 php-curl \
+                 php-imagick \
+                 php-intl \
+                 php-json \
+                 php-mbstring \
+                 php-mysql \
+                 php-xml \
+                 php-zip
+
+COPY --from=wp /var/www/html /var/www/html
+
+#fail2ban
+RUN apt-get update && apt-get install -y \
+    iptables \
+    fail2ban \
+    ufw \
+    vim 
+
+
+COPY ./fail2ban/ /etc/fail2ban/
+#COPY ./fail2ban/jail.local /etc/fail2ban/jail.local
+COPY ./filter.d/ /etc/fail2ban/filter.d/
+
+#to solve iptables cannot initial
+#https://forums.docker.com/t/failing-to-start-dockerd-failed-to-create-nat-chain-docker/78269/2
+run update-alternatives --set iptables /usr/sbin/iptables-legacy
+run update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+
+COPY ./setup.sh /usr/local/bin/setup.sh
+RUN chmod +x /usr/local/bin/setup.sh
+
+
+# it helped me
+#CMD ["/bin/bash", "/usr/local/bin/setup.sh"]
+ENTRYPOINT ["setup.sh"]
+CMD ["apache2ctl", "-D", "FOREGROUND"]

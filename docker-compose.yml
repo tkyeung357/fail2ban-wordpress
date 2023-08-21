@@ -1,0 +1,61 @@
+version: '3.1'
+
+services:
+  server:
+    container_name: wordpress-fail2ban-server
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+    restart: always
+    privileged: true
+    depends_on:
+      - wordpress
+      - db
+    ports:
+      - 80:80
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+        #- ./apachelog:/var/log/apache2
+  wordpress:
+    container_name: wordpress-fail2ban-wordpress
+    image: wordpress:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+        #- ./apachelog:/var/log/apache2
+        #- ./log:/var/log:rw
+    #add platform to solve issue for Mac M processor 
+    #platform: linux/x86_64
+  db:
+    container_name: wordpress-fail2ban-db
+    image: mysql
+    restart: always
+    # NOTE: use of "mysql_native_password" is not recommended: https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+    # (this is just an example, not intended to be a production configuration)
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db1:/var/lib/mysql
+    #add platform to solve issue for Mac M processor 
+    #platform: linux/x86_64
+
+volumes:
+  wordpress:
+  db1:

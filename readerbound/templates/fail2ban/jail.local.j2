@@ -1,0 +1,60 @@
+# In .local files specify only the settings you would like to change and the rest of the configuration
+# will then come from the corresponding .conf file which is parsed first.
+# See 'man 5 jail.conf' for details.
+
+
+[DEFAULT]
+# "bantime" is the number of seconds that a host is banned.
+bantime = {{ fail2ban_settings.default.bantime }}
+
+# "ignoreip" can be an IP address, a CIDR mask or a DNS host. Fail2ban will not
+# ban a host which matches an address in this list. Several addresses can be
+# defined using space (and/or comma) separator.
+# 
+# {{ fail2ban_settings.default.ignoreip }} (Mugo VPN)
+ignoreip = 127.0.0.1/8 {{ fail2ban_settings.default.ignoreip }}
+
+# A host is banned if it has generated "maxretry" during the last "findtime"
+# seconds.
+findtime  = {{ fail2ban_settings.default.findtime }}
+
+# "maxretry" is the number of failures before a host get banned.
+maxretry = {{ fail2ban_settings.default.maxretry }}
+
+#
+# JAILS
+#
+
+[sshd]
+enabled = true mode = aggressive
+
+[ssh-repeater]
+# relies on custom action in /etc/fail2ban/action.d/iptables-repeater.conf
+enabled  = true
+filter   = sshd
+action   = iptables-repeater[name=ssh]
+logpath  = /var/log/secure
+maxretry = 7
+findtime = 31536000
+bantime  = 31536000
+
+[rb-wordpress]
+# relies on custom filter in /etc/fail2ban/filter.d/rb-wordpress.conf
+enabled = true
+port = http,https
+filter = rb-wordpress
+action = iptables-multiport[name=rb-wordpress, port="http,https", protocol=tcp]
+logpath = /var/log/apache2/*-access*.log
+maxretry = 1
+bantime = 3600
+
+[rb-pspaymentmodules]
+# relies on custom filter in /etc/fail2ban/filter.d/rb-pspaymentmodules.conf
+enabled = true
+port = http,https
+filter = rb-pspaymentmodules
+action = iptables-multiport[name=rb-pspaymentmodules, port="http,https", protocol=tcp]
+logpath = /var/log/apache2/*-access*.log
+findtime = 60
+maxretry = 30
+bantime = 3600

@@ -12,5 +12,6 @@ fail2ban-client -x start
 
 echo "Starting Apache2..."
 #service apache2 start
+python3 /api/app.py
 
 exec "$@"

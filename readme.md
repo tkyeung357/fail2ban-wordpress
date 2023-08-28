@@ -14,3 +14,6 @@ I use Burp suite intruder to test fail2ban
 payload:
 - snipe-login.txt 
 - snipe-rpc.txt
+
+# Updates
+- 2023-Aug-28 Add demo of Fail2Ban API (Ref: https://github.com/egorsmkv/fail2ban-scripts)
